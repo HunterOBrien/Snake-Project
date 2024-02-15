@@ -1,5 +1,5 @@
-""" v9
-    adds an increasing speed as the score increases to add difficulty
+""" v10
+
 """
 import pygame
 import time
@@ -48,6 +48,7 @@ def message(msg, txt_colour, bkgd_colour):
 
 
 def game_loop():
+    start_time = time.time() # to record score/time from start of game
     quit_game = False
     game_over = False
 
@@ -126,7 +127,7 @@ def game_loop():
         draw_snake(snake_list)
 
         # Keeps track of player score
-        score = snake_length - 1  # excludes snake head
+        score = round(time.time()) - start_time
         player_score(score, black)
 
         # Links speed of snake to player score to increase difficulty
@@ -153,8 +154,6 @@ def game_loop():
             snake_length += 1
 
         clock.tick(speed)
-
-
 
     pygame.quit()
     quit()
