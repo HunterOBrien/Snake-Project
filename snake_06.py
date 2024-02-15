@@ -1,5 +1,5 @@
-""" v5
-    Allows the user to quit the game when the x button is pressed
+""" v6
+    Snake now grows when it collides with food
 """
 import pygame
 import time
@@ -26,6 +26,13 @@ msg_font = pygame.font.SysFont("arialblack", 20)
 
 clock = pygame.time.Clock()  # Sets the speed for the snake to move
 
+
+# Create snake, replaces the previous snake in main loop
+def draw_snake(snake_list):
+    for i in snake_list:
+        pygame.draw.rect(screen, red, [i[0], i[1], 20, 20])
+
+
 def message(msg, txt_colour, bkgd_colour):
     txt = msg_font.render(msg, True, txt_colour, bkgd_colour)
 
@@ -44,6 +51,8 @@ def game_loop():
 
     snake_x_change = 0  # Variable for change in x-coord per movement
     snake_y_change = 0  # Variable for change in y-coord per movement
+    snake_list = []
+    snake_length = 1
 
     food_x = round(random.randrange(20, 1000 - 20) / 20) * 20
     food_y = round(random.randrange(20, 720 - 20) / 20) * 20
@@ -97,7 +106,19 @@ def game_loop():
 
         screen.fill(green)
 
-        pygame.draw.rect(screen, red, [snake_x, snake_y, 20, 20])
+        # Creates snake (replacing  20x20 rectangle)
+        snake_head = [snake_x, snake_y]
+        snake_list.append(snake_head)
+        if len(snake_list) > snake_length:
+            del snake_list[0]
+
+        # Detects if snake head touches any other part (-1 counts from the end of list)
+        for x in snake_list[:-1]:
+            if x == snake_head:
+                game_over = True
+
+        draw_snake(snake_list)
+
         pygame.display.update()
 
         pygame.draw.circle(screen, yellow, [food_x, food_y], 10)
@@ -108,6 +129,9 @@ def game_loop():
             # Sets new food pos
             food_x = round(random.randrange(20, 1000 - 20) / 20) * 20
             food_y = round(random.randrange(20, 720 - 20) / 20) * 20
+
+            # Increase length of snake when collision with apple
+            snake_length += 1
 
         clock.tick(5)
 
