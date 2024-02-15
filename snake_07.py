@@ -1,5 +1,5 @@
 """ v7
-    
+    changes food to an apple and fixes collision between food and snake by changing spawn conditions
 """
 import pygame
 import time
@@ -46,8 +46,8 @@ def game_loop():
     game_over = False
 
     # snake is 20 x 20 pixels at start
-    snake_x = 490  # (1000 -20) /2  snake is 20pixels so taken away before finding middle value
-    snake_y = 350  # (720 -20) /2  snake is 20pixels so taken away before finding middle value
+    snake_x = 480  # (1000 -20) /2  snake is 20pixels so taken away before finding middle value
+    snake_y = 340  # (720 -20) /2  snake is 20pixels so taken away before finding middle value
 
     snake_x_change = 0  # Variable for change in x-coord per movement
     snake_y_change = 0  # Variable for change in y-coord per movement
@@ -119,13 +119,16 @@ def game_loop():
 
         draw_snake(snake_list)
 
-        pygame.display.update()
+        # Uses a sprite instead of previous circle to represent food
+        food = pygame.Rect(food_x, food_y, 20, 20)
+        apple = pygame.image.load('images/apple_3.png').convert_alpha()
+        resized_apple = pygame.transform.smoothscale(apple, [20, 20])
+        screen.blit(resized_apple, food)
 
-        pygame.draw.circle(screen, yellow, [food_x, food_y], 10)
         pygame.display.update()
 
         # Collision detection (Test if snake touches food)
-        if snake_x == food_x - 10 and snake_y == food_y - 10:
+        if snake_x == food_x and snake_y == food_y:
             # Sets new food pos
             food_x = round(random.randrange(20, 1000 - 20) / 20) * 20
             food_y = round(random.randrange(20, 720 - 20) / 20) * 20
