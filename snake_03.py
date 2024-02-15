@@ -1,5 +1,5 @@
-""" v2
-added check for if arrow keys are down, if so snake will move
+""" v3
+    Checks for snake going out of bounds and ends game if True
 """
 import pygame
 import time
@@ -50,6 +50,10 @@ while not quit_game:
             elif event.key == pygame.K_DOWN:
                 snake_x_change = 0
                 snake_y_change = 20
+
+    # If snake goes out of bounds game finishes
+    if snake_x > 1000 or snake_x < 0 or snake_y >= 720 or snake_y < 0:
+        quit_game = True
 
     snake_x += snake_x_change
     snake_y += snake_y_change
