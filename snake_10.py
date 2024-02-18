@@ -1,5 +1,5 @@
-""" v10 trial
-    Tried using a time based-score but does not incentive getting apples and quickly gets too fast
+""" v10
+    Adds highscore function
 """
 import pygame
 import time
@@ -27,6 +27,19 @@ msg_font = pygame.font.SysFont("arialblack", 20)
 clock = pygame.time.Clock()  # Sets the speed for the snake to move
 
 
+# Function to save highscore in a separate file
+def load_high_score():
+    try:
+        hi_score_file = open("HI_score.txt", 'r')
+    except IOError:
+        hi_score_file = open("HI_score.txt", 'w')
+        hi_score_file.write("0")
+    hi_score_file = open("HI_score.txt", 'r')
+    value = hi_score_file.read()
+    hi_score_file.close()
+    return value
+
+
 # Display player score during the game
 def player_score(score, score_colour):
     display_score = score_font.render(f"Score: {score}", True, score_colour)
@@ -48,7 +61,6 @@ def message(msg, txt_colour, bkgd_colour):
 
 
 def game_loop():
-    start_time = time.time() # to record score/time from start of game
     quit_game = False
     game_over = False
 
@@ -63,6 +75,10 @@ def game_loop():
 
     food_x = round(random.randrange(20, 1000 - 20) / 20) * 20
     food_y = round(random.randrange(20, 720 - 20) / 20) * 20
+
+    # Loads highscore
+    high_score = load_high_score()
+    print(f"high_score test: {high_score}")  # for testing only
 
     quit_game = False
     while not quit_game:
@@ -127,7 +143,7 @@ def game_loop():
         draw_snake(snake_list)
 
         # Keeps track of player score
-        score = round(time.time() - start_time)
+        score = snake_length - 1  # excludes snake head
         player_score(score, black)
 
         # Links speed of snake to player score to increase difficulty

@@ -1,5 +1,5 @@
-""" v10 trial
-    Tried using a time based-score but does not incentive getting apples and quickly gets too fast
+""" v11
+
 """
 import pygame
 import time
@@ -27,10 +27,42 @@ msg_font = pygame.font.SysFont("arialblack", 20)
 clock = pygame.time.Clock()  # Sets the speed for the snake to move
 
 
+# saves updated highscore
+def save_high_score(high_score):
+    high_score_file = open("HI_score.txt", 'w')
+    high_score_file.write(str(high_score))
+    high_score_file.close()
+
+
+# Function to update recorded highscore
+def update_high_score(score, highscore):
+    if int(score) > int(highscore):
+        return score
+    else:
+        return highscore
+
+
+# Function to save highscore in a separate file
+def load_high_score():
+    try:
+        hi_score_file = open("HI_score.txt", 'r')
+    except IOError:
+        hi_score_file = open("HI_score.txt", 'w')
+        hi_score_file.write("0")
+    hi_score_file = open("HI_score.txt", 'r')
+    value = hi_score_file.read()
+    hi_score_file.close()
+    return value
+
+
 # Display player score during the game
-def player_score(score, score_colour):
+def player_score(score, score_colour, hi_score):
     display_score = score_font.render(f"Score: {score}", True, score_colour)
     screen.blit(display_score, (800, 20))  # Coordinates for top right
+
+    # Hi score
+    display_score = score_font.render(f"High Score: {hi_score}", True, score_colour)
+    screen.blit(display_score, (10, 10)) # Coordinates for top left
 
 
 # Create snake, replaces the previous snake in main loop
@@ -48,7 +80,6 @@ def message(msg, txt_colour, bkgd_colour):
 
 
 def game_loop():
-    start_time = time.time() # to record score/time from start of game
     quit_game = False
     game_over = False
 
@@ -64,14 +95,14 @@ def game_loop():
     food_x = round(random.randrange(20, 1000 - 20) / 20) * 20
     food_y = round(random.randrange(20, 720 - 20) / 20) * 20
 
+    # Loads highscore
+    high_score = load_high_score()
+    print(f"high_score test: {high_score}")  # for testing only
+
     quit_game = False
     while not quit_game:
-        # Repeatability
-        # for event in pygame.event.get():
-        # if event.type == pygame.KEYDOWN:
-        # if event.key == pygame.K_r:
-        # game_loop()
         while game_over:
+            save_high_score(high_score)
             screen.fill(white)
             message("You Died! Press Backspace to Quit or Enter to Continue!", black, white)
             pygame.display.update()
@@ -127,8 +158,11 @@ def game_loop():
         draw_snake(snake_list)
 
         # Keeps track of player score
-        score = round(time.time() - start_time)
-        player_score(score, black)
+        score = snake_length - 1  # excludes snake head
+        player_score(score, black, high_score)
+
+        # Get highscore
+        high_score = update_high_score(score, high_score)
 
         # Links speed of snake to player score to increase difficulty
         if score > 3:
