@@ -47,9 +47,28 @@ def draw_snake(snake_list):
         pygame.draw.rect(game_screen, red, [i[0], i[1], 40, 40])
 
 
+def welcome_screen():
+    welcome = True
+    while welcome:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    return
+        main_screen.blit(background_screen, (10, 10))
+        # Add welcome screen elements
+        # Example: You can draw a welcome message, instructions, etc.
+        pygame.display.update()
+        clock.tick(15)
+
+
 def game_loop():
     quit_game = False
     game_over = False
+
+    welcome_screen()
 
     # snake is 20 x 20 pixels at start
     # snake_x = game_screen_width / 2  # (1000 - 40) /2  snake is 40 pixels so taken away before finding middle value
@@ -107,6 +126,11 @@ def game_loop():
         snake_x += snake_x_change
         snake_y += snake_y_change
 
+        # Check for collision with boundary walls
+        if (snake_x < 0 or snake_x >= game_screen_width or
+                snake_y < 0 or snake_y >= game_screen_height):
+            game_over = True
+
         # SCREEN
         main_screen.blit(background_screen, (10, 10))
         main_screen.blit(game_screen, (game_screen_x, game_screen_y))
@@ -123,16 +147,18 @@ def game_loop():
             if x == snake_head:
                 game_over = True
 
+        game_screen.fill(white)
         draw_snake(snake_list)
+        pygame.display.update()
 
         # Keeps track of player score
         score = snake_length - 1  # excludes snake head
 
         # Links speed of snake to player score to increase difficulty
-        if score > 3:
-            speed = score
+        if score > 10:
+            speed = 4.5
         else:
-            speed = 3
+            speed = 3.8
 
         # Uses a sprite instead of previous circle to represent food
         food = pygame.Rect(food_x, food_y, 0, 0)
