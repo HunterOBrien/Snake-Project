@@ -1,4 +1,6 @@
-""" Testing v3
+""" Testing v2
+    Modified screen to have different surfaces allowing for background
+    as well as game screen
 """
 
 import pygame
@@ -10,6 +12,8 @@ pygame.init()
 dark_green = (5, 55, 37)
 white = (255, 255, 255)
 black = (0, 0, 0)
+red = (255, 0, 0)
+green = (188, 227, 199)
 
 game_screen_width = 680  # 17 tiles * 20 pixel snake * 2 (bigger screen)
 game_screen_height = 600  # 15 tiles * 20 pixel snake * 2 (bigger screen)
@@ -34,16 +38,121 @@ game_screen.fill(white)
 background_screen = pygame.Surface((display_info.current_w - 20, display_info.current_h - 20))
 background_screen.fill(dark_green)
 
-quit_game = False
-while not quit_game:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            quit_game = True
+clock = pygame.time.Clock()  # Sets the speed for the snake to move
 
-    main_screen.blit(background_screen, (10, 10))
-    main_screen.blit(game_screen, (game_screen_x, game_screen_y))
 
-    pygame.display.flip()
+# Create snake, replaces the previous snake in main loop
+def draw_snake(snake_list):
+    for i in snake_list:
+        pygame.draw.rect(game_screen, red, [i[0], i[1], 40, 40])
 
-pygame.quit()
-quit()
+
+def game_loop():
+    quit_game = False
+    game_over = False
+
+    # snake is 20 x 20 pixels at start
+    snake_x = (game_screen_x + 20) / 2  # (1000 - 40) /2  snake is 40 pixels so taken away before finding middle value
+    snake_y = game_screen_y + 30   # (720 -20) /2  snake is 40 pixels so taken away before finding middle value
+
+    snake_x_change = 0  # Variable for change in x-coord per movement
+    snake_y_change = 0  # Variable for change in y-coord per movement
+    snake_list = []
+    snake_length = 1
+
+    food_x = round(random.randrange(20, 1000 - 20) / 20) * 20
+    food_y = round(random.randrange(20, 720 - 20) / 20) * 20
+
+    quit_game = False
+    while not quit_game:
+        while game_over:
+            game_screen.fill(white)
+            pygame.display.update()
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_BACKSPACE:
+                        quit_game = True
+                        game_over = False
+                    if event.key == pygame.K_RETURN:
+                        game_loop()
+
+        # if user presses x gives them option to quit
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+
+            # Checks for WASD or Up,Down,Left,Right then adds to snake x,y change variables
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    snake_x_change = -20
+                    snake_y_change = 0
+                elif event.key == pygame.K_RIGHT:
+                    snake_x_change = 20
+                    snake_y_change = 0
+                elif event.key == pygame.K_UP:
+                    snake_x_change = 0
+                    snake_y_change = -20
+                elif event.key == pygame.K_DOWN:
+                    snake_x_change = 0
+                    snake_y_change = 20
+
+        # If snake goes out of bounds game finishes
+        if snake_x > 1000 or snake_x < 0 or snake_y >= 720 or snake_y < 0:
+            game_over = True
+
+        snake_x += snake_x_change
+        snake_y += snake_y_change
+
+        # SCREEN
+        main_screen.blit(background_screen, (10, 10))
+        main_screen.blit(game_screen, (game_screen_x, game_screen_y))
+
+        pygame.display.flip()
+
+        # Creates snake (replacing  20x20 rectangle)
+        snake_head = [snake_x, snake_y]
+        snake_list.append(snake_head)
+        if len(snake_list) > snake_length:
+            del snake_list[0]
+
+        # Detects if snake head touches any other part (-1 counts from the end of list)
+        for x in snake_list[:-1]:
+            if x == snake_head:
+                game_over = True
+
+        draw_snake(snake_list)
+
+        # Keeps track of player score
+        score = snake_length - 1  # excludes snake head
+
+        # Links speed of snake to player score to increase difficulty
+        if score > 3:
+            speed = score
+        else:
+            speed = 3
+
+        # Uses a sprite instead of previous circle to represent food
+        food = pygame.Rect(food_x, food_y, 20, 20)
+        apple = pygame.image.load('images/apple_3.png').convert_alpha()
+        resized_apple = pygame.transform.smoothscale(apple, [20, 20])
+        game_screen.blit(resized_apple, food)
+
+        pygame.display.update()
+
+        # Collision detection (Test if snake touches food)
+        if snake_x == food_x and snake_y == food_y:
+            # Sets new food pos
+            food_x = round(random.randrange(20, 1000 - 20) / 20) * 20
+            food_y = round(random.randrange(20, 720 - 20) / 20) * 20
+
+            # Increase length of snake when collision with apple
+            snake_length += 1
+
+        clock.tick(speed)
+
+    pygame.quit()
+    quit()
+
+
+game_loop()
