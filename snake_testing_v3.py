@@ -52,16 +52,16 @@ def game_loop():
     game_over = False
 
     # snake is 20 x 20 pixels at start
-    snake_x = (game_screen_x + 20) / 2  # (1000 - 40) /2  snake is 40 pixels so taken away before finding middle value
-    snake_y = game_screen_y + 30   # (720 -20) /2  snake is 40 pixels so taken away before finding middle value
+    snake_x = game_screen_width / 2  # (1000 - 40) /2  snake is 40 pixels so taken away before finding middle value
+    snake_y = game_screen_height / 2  # (720 -20) /2  snake is 40 pixels so taken away before finding middle value
 
     snake_x_change = 0  # Variable for change in x-coord per movement
     snake_y_change = 0  # Variable for change in y-coord per movement
     snake_list = []
     snake_length = 1
 
-    food_x = round(random.randrange(20, 1000 - 20) / 20) * 20
-    food_y = round(random.randrange(20, 720 - 20) / 20) * 20
+    food_x = round(random.randrange(0, game_screen_width - 40) / 40) * 40
+    food_y = round(random.randrange(0, game_screen_height - 40) / 40) * 40
 
     quit_game = False
     while not quit_game:
@@ -85,21 +85,22 @@ def game_loop():
             # Checks for WASD or Up,Down,Left,Right then adds to snake x,y change variables
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    snake_x_change = -20
+                    snake_x_change = -40
                     snake_y_change = 0
                 elif event.key == pygame.K_RIGHT:
-                    snake_x_change = 20
+                    snake_x_change = 40
                     snake_y_change = 0
                 elif event.key == pygame.K_UP:
                     snake_x_change = 0
-                    snake_y_change = -20
+                    snake_y_change = -40
                 elif event.key == pygame.K_DOWN:
                     snake_x_change = 0
-                    snake_y_change = 20
+                    snake_y_change = 40
 
         # If snake goes out of bounds game finishes
-        if snake_x > 1000 or snake_x < 0 or snake_y >= 720 or snake_y < 0:
-            game_over = True
+        # if snake_x > game_screen_x + 680 or snake_x < game_screen_x or snake_y >=
+        # game_screen_y + 600 or snake_y < game_screen_y:
+        # game_over = True
 
         snake_x += snake_x_change
         snake_y += snake_y_change
@@ -107,8 +108,7 @@ def game_loop():
         # SCREEN
         main_screen.blit(background_screen, (10, 10))
         main_screen.blit(game_screen, (game_screen_x, game_screen_y))
-
-        pygame.display.flip()
+        pygame.display.update()
 
         # Creates snake (replacing  20x20 rectangle)
         snake_head = [snake_x, snake_y]
@@ -133,9 +133,9 @@ def game_loop():
             speed = 3
 
         # Uses a sprite instead of previous circle to represent food
-        food = pygame.Rect(food_x, food_y, 20, 20)
+        food = pygame.Rect(food_x, food_y, 40, 40)
         apple = pygame.image.load('images/apple_3.png').convert_alpha()
-        resized_apple = pygame.transform.smoothscale(apple, [20, 20])
+        resized_apple = pygame.transform.smoothscale(apple, [40, 40])
         game_screen.blit(resized_apple, food)
 
         pygame.display.update()
@@ -143,8 +143,8 @@ def game_loop():
         # Collision detection (Test if snake touches food)
         if snake_x == food_x and snake_y == food_y:
             # Sets new food pos
-            food_x = round(random.randrange(20, 1000 - 20) / 20) * 20
-            food_y = round(random.randrange(20, 720 - 20) / 20) * 20
+            food_x = round(random.randrange(game_screen_x, game_screen_x + game_screen_width - 40) / 40) * 40
+            food_y = round(random.randrange(game_screen_y, game_screen_y + game_screen_height - 40) / 40) * 40
 
             # Increase length of snake when collision with apple
             snake_length += 1
