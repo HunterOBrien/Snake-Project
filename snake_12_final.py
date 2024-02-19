@@ -1,5 +1,5 @@
-""" v11
-
+""" v12
+    Final polishing touches
 """
 import pygame
 import time

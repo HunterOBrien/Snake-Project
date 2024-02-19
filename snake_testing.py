@@ -1,6 +1,3 @@
-""" v11
-
-"""
 import pygame
 import time
 import random
@@ -10,10 +7,9 @@ pygame.init()
 game_icon = pygame.image.load('images/snake_icon.png')
 pygame.display.set_icon(game_icon)
 pygame.display.set_caption("Snake game - by Patrick Baker")
-screen = pygame.display.set_mode((340, 300), pygame.RESIZABLE)
+screen = pygame.display.set_mode((17 * 20, 15 * 20))  # Adjusted screen size
 
-
-# Colour hex codes
+# Color hex codes
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
@@ -59,11 +55,11 @@ def load_high_score():
 # Display player score during the game
 def player_score(score, score_colour, hi_score):
     display_score = score_font.render(f"Score: {score}", True, score_colour)
-    screen.blit(display_score, (270, 20))  # Coordinates for top right
+    screen.blit(display_score, (17 * 20 - 150, 20))  # Coordinates for top right adjusted
 
     # Hi score
     display_score = score_font.render(f"High Score: {hi_score}", True, score_colour)
-    screen.blit(display_score, (10, 10))  # Coordinates for top left
+    screen.blit(display_score, (20, 20))  # Coordinates for top left adjusted
 
 
 # Create snake, replaces the previous snake in main loop
@@ -75,8 +71,8 @@ def draw_snake(snake_list):
 def message(msg, txt_colour, bkgd_colour):
     txt = msg_font.render(msg, True, txt_colour, bkgd_colour)
 
-    # Center rect 340/2, 300/2
-    text_box = txt.get_rect(center=(170, 150))
+    # Center rect 17 * 20 / 2, 15 * 20 / 2
+    text_box = txt.get_rect(center=(17 * 20 // 2, 15 * 20 // 2))
     screen.blit(txt, text_box)
 
 
@@ -84,18 +80,17 @@ def game_loop():
     quit_game = False
     game_over = False
 
-    # classic snake game 17 x 15 tiles
     # snake is 20 x 20 pixels at start
-    snake_x = 160  # (340 -20) /2  snake is 20pixels so taken away before finding middle value
-    snake_y = 140  # (300 -20) /2  snake is 20pixels so taken away before finding middle value
+    snake_x = 8 * 20  # Middle of the screen
+    snake_y = 7 * 20  # Middle of the screen
 
     snake_x_change = 0  # Variable for change in x-coord per movement
     snake_y_change = 0  # Variable for change in y-coord per movement
     snake_list = []
     snake_length = 1
 
-    food_x = round(random.randrange(20, 340 - 20) / 20) * 20
-    food_y = round(random.randrange(20, 300 - 20) / 20) * 20
+    food_x = round(random.randrange(1, 16) * 20)  # Random x within the grid
+    food_y = round(random.randrange(1, 14) * 20)  # Random y within the grid
 
     # Loads highscore
     high_score = load_high_score()
@@ -137,7 +132,7 @@ def game_loop():
                     snake_y_change = 20
 
         # If snake goes out of bounds game finishes
-        if snake_x > 320 or snake_x < 0 or snake_y >= 280 or snake_y < 0:
+        if snake_x > 16 * 20 or snake_x < 0 or snake_y >= 15 * 20 or snake_y < 0:
             game_over = True
 
         snake_x += snake_x_change
@@ -182,8 +177,8 @@ def game_loop():
         # Collision detection (Test if snake touches food)
         if snake_x == food_x and snake_y == food_y:
             # Sets new food pos
-            food_x = round(random.randrange(20, 340 - 20) / 20) * 20
-            food_y = round(random.randrange(20, 300 - 20) / 20) * 20
+            food_x = round(random.randrange(1, 16) * 20)
+            food_y = round(random.randrange(1, 14) * 20)
 
             # Increase length of snake when collision with apple
             snake_length += 1
