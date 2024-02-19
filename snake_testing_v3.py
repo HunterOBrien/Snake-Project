@@ -52,8 +52,10 @@ def game_loop():
     game_over = False
 
     # snake is 20 x 20 pixels at start
-    snake_x = game_screen_width / 2  # (1000 - 40) /2  snake is 40 pixels so taken away before finding middle value
-    snake_y = game_screen_height / 2  # (720 -20) /2  snake is 40 pixels so taken away before finding middle value
+    # snake_x = game_screen_width / 2  # (1000 - 40) /2  snake is 40 pixels so taken away before finding middle value
+    # snake_y = game_screen_height / 2  # (720 -20) /2  snake is 40 pixels so taken away before finding middle value
+    snake_x = round((game_screen_width - 40) / 2 / 40) * 40
+    snake_y = round((game_screen_height - 40) / 2 / 40) * 40
 
     snake_x_change = 0  # Variable for change in x-coord per movement
     snake_y_change = 0  # Variable for change in y-coord per movement
@@ -133,7 +135,7 @@ def game_loop():
             speed = 3
 
         # Uses a sprite instead of previous circle to represent food
-        food = pygame.Rect(food_x, food_y, 40, 40)
+        food = pygame.Rect(food_x, food_y, 0, 0)
         apple = pygame.image.load('images/apple_3.png').convert_alpha()
         resized_apple = pygame.transform.smoothscale(apple, [40, 40])
         game_screen.blit(resized_apple, food)
@@ -143,8 +145,8 @@ def game_loop():
         # Collision detection (Test if snake touches food)
         if snake_x == food_x and snake_y == food_y:
             # Sets new food pos
-            food_x = round(random.randrange(game_screen_x, game_screen_x + game_screen_width - 40) / 40) * 40
-            food_y = round(random.randrange(game_screen_y, game_screen_y + game_screen_height - 40) / 40) * 40
+            food_x = round(random.randrange(0, game_screen_width - 40) / 40) * 40
+            food_y = round(random.randrange(0, game_screen_height - 40) / 40) * 40
 
             # Increase length of snake when collision with apple
             snake_length += 1
