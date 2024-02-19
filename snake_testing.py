@@ -1,3 +1,9 @@
+""" Testing v1
+    Changed screen size to be like classic 17x15 grid, adjusted
+    fruit spawning border locations etc.
+
+"""
+
 import pygame
 import time
 import random
