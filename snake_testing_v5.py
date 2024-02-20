@@ -46,44 +46,6 @@ background_screen.fill(dark_green)
 clock = pygame.time.Clock()  # Sets the speed for the snake to move
 
 
-# saves updated highscore
-def save_high_score(high_score):
-    high_score_file = open("HI_score.txt", 'w')
-    high_score_file.write(str(high_score))
-    high_score_file.close()
-
-
-# Function to update recorded highscore
-def update_high_score(score, highscore):
-    if int(score) > int(highscore):
-        return score
-    else:
-        return highscore
-
-
-# Function to save highscore in a separate file
-def load_high_score():
-    try:
-        hi_score_file = open("HI_score.txt", 'r')
-    except IOError:
-        hi_score_file = open("HI_score.txt", 'w')
-        hi_score_file.write("0")
-    hi_score_file = open("HI_score.txt", 'r')
-    value = hi_score_file.read()
-    hi_score_file.close()
-    return value
-
-
-# Display player score during the game
-def player_score(score, score_colour, hi_score):
-    display_score = score_font.render(f"Score: {score}", True, score_colour)
-    game_screen.blit(display_score, (800, 20))  # Coordinates for top right
-
-    # Hi score
-    display_score = score_font.render(f"High Score: {hi_score}", True, score_colour)
-    game_screen.blit(display_score, (10, 10))  # Coordinates for top left
-
-
 # Create snake, replaces the previous snake in main loop
 def draw_snake(snake_list):
     for i in snake_list:
@@ -95,8 +57,6 @@ def game_loop():
     game_over = False
 
     # snake is 20 x 20 pixels at start
-    # snake_x = game_screen_width / 2  # (1000 - 40) /2  snake is 40 pixels so taken away before finding middle value
-    # snake_y = game_screen_height / 2  # (720 -20) /2  snake is 40 pixels so taken away before finding middle value
     snake_x = round((game_screen_width - 40) / 2 / 40) * 40
     snake_y = round((game_screen_height - 40) / 2 / 40) * 40
 
@@ -158,6 +118,7 @@ def game_loop():
         # SCREEN
         main_screen.blit(background_screen, (10, 10))
         main_screen.blit(game_screen, (game_screen_x, game_screen_y))
+
         pygame.display.update()
 
         # Creates snake (replacing  20x20 rectangle)
@@ -171,21 +132,12 @@ def game_loop():
             if x == snake_head:
                 game_over = True
 
+        draw_snake(snake_list)
+
         # Keeps track of player score
         score = snake_length - 1  # excludes snake head
         player_score(score, black, high_score)
 
-        # Get highscore
-        high_score = update_high_score(score, high_score)
-
-        game_screen.fill(white)
-        draw_snake(snake_list)
-        pygame.display.update()
-
-        # Keeps track of player score
-        score = snake_length - 1  # excludes snake head
-
-        # Links speed of snake to player score to increase difficulty
         if score > 10:
             speed = 4.5
         else:
@@ -196,6 +148,17 @@ def game_loop():
         apple = pygame.image.load('images/apple_3.png').convert_alpha()
         resized_apple = pygame.transform.smoothscale(apple, [40, 40])
         game_screen.blit(resized_apple, food)
+
+        pygame.display.update()
+
+        # Get highscore
+        high_score = update_high_score(score, high_score)
+
+        game_screen.fill(white)
+        draw_snake(snake_list)
+
+        # Display food
+        pygame.draw.rect(game_screen, green, [food_x, food_y, 40, 40])
 
         pygame.display.update()
 
@@ -214,9 +177,48 @@ def game_loop():
     quit()
 
 
+
 def quit_game():
     pygame.quit()
     quit()
+
+
+# saves updated highscore
+def save_high_score(high_score):
+    high_score_file = open("HI_score.txt", 'w')
+    high_score_file.write(str(high_score))
+    high_score_file.close()
+
+
+# Function to update recorded highscore
+def update_high_score(score, highscore):
+    if int(score) > int(highscore):
+        return score
+    else:
+        return highscore
+
+
+# Function to save highscore in a separate file
+def load_high_score():
+    try:
+        hi_score_file = open("HI_score.txt", 'r')
+    except IOError:
+        hi_score_file = open("HI_score.txt", 'w')
+        hi_score_file.write("0")
+    hi_score_file = open("HI_score.txt", 'r')
+    value = hi_score_file.read()
+    hi_score_file.close()
+    return value
+
+
+# Display player score during the game
+def player_score(score, score_colour, hi_score):
+    display_score = score_font.render(f"Score: {score}", True, score_colour)
+    game_screen.blit(display_score, (800, 20))  # Coordinates for top right
+
+    # Hi score
+    display_score = score_font.render(f"High Score: {hi_score}", True, score_colour)
+    game_screen.blit(display_score, (10, 10))  # Coordinates for top left
 
 
 def welcome_screen():
