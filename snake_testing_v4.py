@@ -1,6 +1,5 @@
-""" Testing v3
-    Modified snake game to run a 17x15 grid
-    added welcome_screen
+""" Testing v4
+    Added Message to Welcome/Death screen
 """
 
 import pygame
@@ -14,6 +13,8 @@ white = (255, 255, 255)
 black = (0, 0, 0)
 red = (255, 0, 0)
 green = (188, 227, 199)
+
+msg_font = pygame.font.SysFont("arialblack", 20)
 
 game_screen_width = 680  # 17 tiles * 20 pixel snake * 2 (bigger screen)
 game_screen_height = 600  # 15 tiles * 20 pixel snake * 2 (bigger screen)
@@ -48,7 +49,7 @@ def draw_snake(snake_list):
 
 
 def game_loop():
-    quit_game = False
+    global game_over
     game_over = False
 
     # snake is 20 x 20 pixels at start
@@ -100,11 +101,6 @@ def game_loop():
                 elif event.key == pygame.K_DOWN:
                     snake_x_change = 0
                     snake_y_change = 40
-
-        # If snake goes out of bounds game finishes
-        # if snake_x > game_screen_x + 680 or snake_x < game_screen_x or snake_y >=
-        # game_screen_y + 600 or snake_y < game_screen_y:
-        # game_over = True
 
         snake_x += snake_x_change
         snake_y += snake_y_change
@@ -166,22 +162,36 @@ def game_loop():
     quit()
 
 
+def quit_game():
+    pygame.quit()
+    quit()
+
+
 def welcome_screen():
+    welcome_message = "Welcome to the Snake Game! Press Enter to start. Backspace to Quit"
+    welcome_font = pygame.font.Font(None, 36)
+    text_surface = welcome_font.render(welcome_message, True, white)
+    text_rect = text_surface.get_rect(center=(full_screen_size[0] // 2, full_screen_size[1] // 2))
+
     welcome = True
     while welcome:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
+                if event.key == pygame.K_BACKSPACE:
+                    quit_game()
+                elif event.key == pygame.K_RETURN:
                     welcome = False  # Exit the loop when Enter key is pressed
                     game_loop()
+
         main_screen.blit(background_screen, (10, 10))
-        # Add welcome screen elements
-        # Example: You can draw a welcome message, instructions, etc.
+        # Draw the welcome message on the screen
+        main_screen.blit(text_surface, text_rect)
+
         pygame.display.update()
         clock.tick(15)
+
+
+
 
 
 welcome_screen()

@@ -1,6 +1,5 @@
-""" Testing v3
-    Modified snake game to run a 17x15 grid
-    added welcome_screen
+""" Testing v4
+    Added Message to Welcome/Death screen
 """
 
 import pygame
@@ -14,6 +13,12 @@ white = (255, 255, 255)
 black = (0, 0, 0)
 red = (255, 0, 0)
 green = (188, 227, 199)
+
+# Game Fonts
+score_font = pygame.font.SysFont("snake chan.ttf", 20)
+exit_font = pygame.font.SysFont("freesansbold.ttf", 30)
+msg_font = pygame.font.SysFont("arialblack", 20)
+
 
 game_screen_width = 680  # 17 tiles * 20 pixel snake * 2 (bigger screen)
 game_screen_height = 600  # 15 tiles * 20 pixel snake * 2 (bigger screen)
@@ -41,6 +46,44 @@ background_screen.fill(dark_green)
 clock = pygame.time.Clock()  # Sets the speed for the snake to move
 
 
+# saves updated highscore
+def save_high_score(high_score):
+    high_score_file = open("HI_score.txt", 'w')
+    high_score_file.write(str(high_score))
+    high_score_file.close()
+
+
+# Function to update recorded highscore
+def update_high_score(score, highscore):
+    if int(score) > int(highscore):
+        return score
+    else:
+        return highscore
+
+
+# Function to save highscore in a separate file
+def load_high_score():
+    try:
+        hi_score_file = open("HI_score.txt", 'r')
+    except IOError:
+        hi_score_file = open("HI_score.txt", 'w')
+        hi_score_file.write("0")
+    hi_score_file = open("HI_score.txt", 'r')
+    value = hi_score_file.read()
+    hi_score_file.close()
+    return value
+
+
+# Display player score during the game
+def player_score(score, score_colour, hi_score):
+    display_score = score_font.render(f"Score: {score}", True, score_colour)
+    game_screen.blit(display_score, (800, 20))  # Coordinates for top right
+
+    # Hi score
+    display_score = score_font.render(f"High Score: {hi_score}", True, score_colour)
+    game_screen.blit(display_score, (10, 10))  # Coordinates for top left
+
+
 # Create snake, replaces the previous snake in main loop
 def draw_snake(snake_list):
     for i in snake_list:
@@ -48,7 +91,7 @@ def draw_snake(snake_list):
 
 
 def game_loop():
-    quit_game = False
+    global game_over
     game_over = False
 
     # snake is 20 x 20 pixels at start
@@ -64,10 +107,13 @@ def game_loop():
 
     food_x = round(random.randrange(0, game_screen_width - 40) / 40) * 40
     food_y = round(random.randrange(0, game_screen_height - 40) / 40) * 40
+    # Loads highscore
+    high_score = load_high_score()
 
     quit_game = False
     while not quit_game:
         while game_over:
+            save_high_score(high_score)
             game_screen.fill(white)
             pygame.display.update()
 
@@ -101,11 +147,6 @@ def game_loop():
                     snake_x_change = 0
                     snake_y_change = 40
 
-        # If snake goes out of bounds game finishes
-        # if snake_x > game_screen_x + 680 or snake_x < game_screen_x or snake_y >=
-        # game_screen_y + 600 or snake_y < game_screen_y:
-        # game_over = True
-
         snake_x += snake_x_change
         snake_y += snake_y_change
 
@@ -129,6 +170,13 @@ def game_loop():
         for x in snake_list[:-1]:
             if x == snake_head:
                 game_over = True
+
+        # Keeps track of player score
+        score = snake_length - 1  # excludes snake head
+        player_score(score, black, high_score)
+
+        # Get highscore
+        high_score = update_high_score(score, high_score)
 
         game_screen.fill(white)
         draw_snake(snake_list)
@@ -166,20 +214,31 @@ def game_loop():
     quit()
 
 
+def quit_game():
+    pygame.quit()
+    quit()
+
+
 def welcome_screen():
+    welcome_message = "Welcome to the Snake Game! Press Enter to start. Backspace to Quit"
+    welcome_font = pygame.font.Font(None, 36)
+    text_surface = welcome_font.render(welcome_message, True, white)
+    text_rect = text_surface.get_rect(center=(full_screen_size[0] // 2, full_screen_size[1] // 2))
+
     welcome = True
     while welcome:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
+                if event.key == pygame.K_BACKSPACE:
+                    quit_game()
+                elif event.key == pygame.K_RETURN:
                     welcome = False  # Exit the loop when Enter key is pressed
                     game_loop()
+
         main_screen.blit(background_screen, (10, 10))
-        # Add welcome screen elements
-        # Example: You can draw a welcome message, instructions, etc.
+        # Draw the welcome message on the screen
+        main_screen.blit(text_surface, text_rect)
+
         pygame.display.update()
         clock.tick(15)
 
