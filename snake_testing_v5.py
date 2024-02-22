@@ -1,5 +1,6 @@
-""" Testing v4
-    Added Message to Welcome/Death screen
+""" Testing v5
+    added back highscore and score functionality
+    fixed bug where apple would only spawn when score < 10
 """
 
 import pygame
@@ -18,7 +19,6 @@ green = (188, 227, 199)
 score_font = pygame.font.SysFont("snake chan.ttf", 20)
 exit_font = pygame.font.SysFont("freesansbold.ttf", 30)
 msg_font = pygame.font.SysFont("arialblack", 20)
-
 
 game_screen_width = 680  # 17 tiles * 20 pixel snake * 2 (bigger screen)
 game_screen_height = 600  # 15 tiles * 20 pixel snake * 2 (bigger screen)
@@ -134,6 +134,10 @@ def game_loop():
 
         draw_snake(snake_list)
 
+        game_screen.fill(white)
+        draw_snake(snake_list)
+        pygame.display.update()
+
         # Keeps track of player score
         score = snake_length - 1  # excludes snake head
         player_score(score, black, high_score)
@@ -154,13 +158,9 @@ def game_loop():
         # Get highscore
         high_score = update_high_score(score, high_score)
 
-        game_screen.fill(white)
-        draw_snake(snake_list)
-
         # Display food
-        pygame.draw.rect(game_screen, green, [food_x, food_y, 40, 40])
-
-        pygame.display.update()
+        # pygame.draw.rect(game_screen, green, [food_x, food_y, 40, 40])
+        # pygame.display.update()
 
         # Collision detection (Test if snake touches food)
         if snake_x == food_x and snake_y == food_y:
@@ -175,7 +175,6 @@ def game_loop():
 
     pygame.quit()
     quit()
-
 
 
 def quit_game():
@@ -214,7 +213,7 @@ def load_high_score():
 # Display player score during the game
 def player_score(score, score_colour, hi_score):
     display_score = score_font.render(f"Score: {score}", True, score_colour)
-    game_screen.blit(display_score, (800, 20))  # Coordinates for top right
+    game_screen.blit(display_score, (600, 20))  # Coordinates for top right
 
     # Hi score
     display_score = score_font.render(f"High Score: {hi_score}", True, score_colour)

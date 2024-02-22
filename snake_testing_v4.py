@@ -145,6 +145,7 @@ def game_loop():
         resized_apple = pygame.transform.smoothscale(apple, [40, 40])
         game_screen.blit(resized_apple, food)
 
+        #  pygame.draw.rect(game_screen, green, [food_x, food_y, 40, 40])
         pygame.display.update()
 
         # Collision detection (Test if snake touches food)
